@@ -1,0 +1,33 @@
+name: Download Repo on Push
+
+on:
+  push:
+
+jobs:
+  prepare_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          echo "::set-output name=matrix::{\"include\":[{\"context\":\"dir1\"},{\"context\":\"dir2\"}]}"
+
+  build_and_push:
+    needs: prepare_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.prepare_matrix.outputs.matrix)}}
+    steps:
+      - run: "hello"
+
+      #-
+      #  name: Set up Docker Buildx
+      #  uses: docker/setup-buildx-action@v3
+      #-
+      #  name: Build and push
+      #  uses: docker/build-push-action@v5
+      #  with:
+      #    context: ${{ github.workspace }}/${{ matrix.context }}
+      #    push: true
+      #    tags: user/app:latest
