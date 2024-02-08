@@ -11,7 +11,7 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          echo "::set-output name=matrix::{\"include\":[{\"context\":\"dir1\"},{\"context\":\"dir2\"}]}"
+          echo "::set-output name=matrix::{\"include\":[{\"context\":\"dir1\", \"tag\":\"tag1\"},{\"context\":\"dir2\", \"tag\":\"tag2\"}]}"
 
   build_and_push:
     needs: prepare_matrix
@@ -19,7 +19,8 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.prepare_matrix.outputs.matrix)}}
     steps:
-      - run: "hello"
+      - run: echo "hello"
+      - run: echo "${{matrix.tag}} ${{matrix.workspace}}"
 
       #-
       #  name: Set up Docker Buildx
