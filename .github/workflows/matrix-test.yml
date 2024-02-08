@@ -3,27 +3,27 @@ name: Download Repo on Push
 on:
   push:
 
-jobs:
-  prepare_matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - run : echo "hello1" > /tmp/hello1.txt && echo "hello2" > /tmp/hello2.txt
-      - id: set-matrix
-        run: |
-          echo "::set-output name=matrix::{\"include\":[{\"context\":\"/tmp/hello1.txt\", \"name\":\"hello1\"},{\"context\":\"/tmp/hello2.txt\", \"name\":\"hello2\"}]}"
-
-  build_and_push:
-    needs: prepare_matrix
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{fromJson(needs.prepare_matrix.outputs.matrix)}}
-    steps:
-      - uses: actions/upload-artifact@3
-        with: 
-          name: ${{matrix.name}}
-          path: ${{matrix.context}}
+#jobs:
+#  prepare_matrix:
+#    runs-on: ubuntu-latest
+#    outputs:
+#      matrix: ${{ steps.set-matrix.outputs.matrix }}
+#    steps:
+#      - run : echo "hello1" > /tmp/hello1.txt && echo "hello2" > /tmp/hello2.txt
+#      - id: set-matrix
+#        run: |
+#          echo "::set-output name=matrix::{\"include\":[{\"context\":\"/tmp/hello1.txt\", \"name\":\"hello1\"},{\"context\":\"/tmp/hello2.txt\", \"name\":\"hello2\"}]}"
+#
+#  build_and_push:
+#    needs: prepare_matrix
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix: ${{fromJson(needs.prepare_matrix.outputs.matrix)}}
+#    steps:
+#      - uses: actions/upload-artifact@4
+#        with: 
+#          name: ${{matrix.name}}
+#          path: ${{matrix.context}}
 
 
       #-
@@ -36,3 +36,20 @@ jobs:
       #    context: ${{ github.workspace }}/${{ matrix.context }}
       #    push: true
       #    tags: user/app:latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Create a File
+        run: |
+          echo "Sample content for the artifact file" > sample.txt
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sample-artifact
+          path: sample.txt
