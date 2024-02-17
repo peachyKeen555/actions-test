@@ -33,7 +33,7 @@ jobs:
           # Set the matrix JSON as an output variable
           
 
-          echo $"MATRIX_JSON" > output.json
+          echo $MATRIX_JSON > output.json
           echo "::set-output name=matrix::${MATRIX_JSON}"
           ls -la
 
