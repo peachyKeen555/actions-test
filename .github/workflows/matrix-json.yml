@@ -17,30 +17,30 @@ jobs:
 
       - id: create-matrix
         run: |
-          # Create an array to hold each metadata entry
-          MATRIX_ENTRIES=()
-
+          # Initialize an empty JSON array
+          MATRIX_JSON=$(jq -n '[]')
+          
           # Loop through all metadata.json files in the dist directory
           for file in $(find json-files -name 'metadata.json'); do
-            # Read the content of the current metadata.json file
-            CONTENT=$(cat $file)
-            # Append the content to the MATRIX_ENTRIES array
-            MATRIX_ENTRIES+=("$CONTENT")
+            # Slurp the file content into the MATRIX_JSON array
+            MATRIX_JSON=$(jq --argfile content $file '. += [$content]' <<< "$MATRIX_JSON")
           done
-
-          # Construct the final matrix JSON, combining all entries
-          MATRIX_JSON="{\"include\":[${MATRIX_ENTRIES[@]}]}"
-          # Set the matrix JSON as an output variable
           
-
-          echo $MATRIX_JSON > output.json
-          echo "::set-output name=matrix::${MATRIX_JSON}"
-          ls -la
+          # Wrap the array in an 'include' object
+          MATRIX_JSON=$(jq '{include: .}' <<< "$MATRIX_JSON")
+          
+          # Echo the final MATRIX_JSON into a file named 'matrix.json'
+          echo "$MATRIX_JSON" > matrix.json
+          
+          # Use environment file to set the matrix JSON as an output variable
+          echo "MATRIX_JSON<<EOF" >> $GITHUB_OUTPUT
+          echo "$MATRIX_JSON" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: output.json
+          path: matrix.json
 
 
   use_matrix:
