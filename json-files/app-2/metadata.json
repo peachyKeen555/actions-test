@@ -1,0 +1,4 @@
+{
+	"dockerfile": "src/app1/Dockerfile",
+	"dockerfile_working_directory": "src/app1/"
+}

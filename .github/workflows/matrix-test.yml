@@ -1,7 +1,7 @@
 name: Download Repo on Push
 
 on:
-  push:
+  workflow_dispatch:
 
 jobs:
   prepare_matrix:

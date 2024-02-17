@@ -1,0 +1,45 @@
+name: Generate Matrix from Metadata Files
+
+on:
+  push:
+
+jobs:
+  build_and_prepare_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.create-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Step
+        run: |
+          # Your build commands here
+          # This should produce the dist directory with metadata.json files
+
+      - id: create-matrix
+        run: |
+          # Create an array to hold each metadata entry
+          MATRIX_ENTRIES=()
+
+          # Loop through all metadata.json files in the dist directory
+          for file in $(find json-files -name 'metadata.json'); do
+            # Read the content of the current metadata.json file
+            CONTENT=$(cat $file)
+            # Append the content to the MATRIX_ENTRIES array
+            MATRIX_ENTRIES+=("$CONTENT")
+          done
+
+          # Construct the final matrix JSON, combining all entries
+          MATRIX_JSON="{\"include\":[${MATRIX_ENTRIES[@]}]}"
+          # Set the matrix JSON as an output variable
+          echo "::set-output name=matrix::${MATRIX_JSON}"
+
+  use_matrix:
+    needs: build_and_prepare_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.build_and_prepare_matrix.outputs.matrix)}}
+    steps:
+      - name: Use Matrix
+        run: |
+          echo "Using matrix context: ${{ matrix.dockerfile }}"
+          echo "With name: ${{ matrix.dockerfile_working_directory }}"
