@@ -30,17 +30,16 @@ jobs:
           MATRIX_JSON=$(jq '{include: .}' <<< "$MATRIX_JSON")
           
           # Echo the final MATRIX_JSON into a file named 'matrix.json'
-          echo "$MATRIX_JSON" > matrix.json
+          echo "$MATRIX_JSON" > /tmp/matrix.json
           
-          # Use environment file to set the matrix JSON as an output variable
-          echo "MATRIX_JSON<<EOF" >> $GITHUB_OUTPUT
-          echo "$MATRIX_JSON" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          # Set variable
+          echo "matrix=$(< /tmp/matrix.json)" >> $GITHUB_OUTPUT
+
 
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: matrix.json
+          path: /tmp/matrix.json
 
 
   use_matrix:
