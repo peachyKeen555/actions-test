@@ -40,7 +40,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: ouput.json  
+          path: output.json
 
 
   use_matrix:
