@@ -35,7 +35,9 @@ jobs:
 
       - id: create-matrix
         run: |
-          echo "matrix=$(cat /tmp/matrix.json)" >> $GITHUB_ENV
+          echo "matrix<<EOF" >> $GITHUB_OUTPUT
+          cat /tmp/matrix.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
 
       - uses: actions/upload-artifact@v2
