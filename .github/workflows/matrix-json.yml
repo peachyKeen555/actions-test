@@ -31,7 +31,16 @@ jobs:
           # Construct the final matrix JSON, combining all entries
           MATRIX_JSON="{\"include\":[${MATRIX_ENTRIES[@]}]}"
           # Set the matrix JSON as an output variable
+          
+
+          echo $MATRIX_JSON > output.json
           echo "::set-output name=matrix::${MATRIX_JSON}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: ouput.json  
+
 
   use_matrix:
     needs: build_and_prepare_matrix
