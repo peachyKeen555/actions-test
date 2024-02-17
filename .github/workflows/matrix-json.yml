@@ -15,7 +15,7 @@ jobs:
           # Your build commands here
           # This should produce the dist directory with metadata.json files
 
-      - id: create-matrix
+      - name: bash script for matrix creation
         run: |
           # Initialize an empty JSON array
           MATRIX_JSON=$(jq -n '[]')
@@ -32,8 +32,10 @@ jobs:
           # Echo the final MATRIX_JSON into a file named 'matrix.json'
           echo "$MATRIX_JSON" > /tmp/matrix.json
           
-          # Set variable
-          echo "matrix=$(< /tmp/matrix.json)" >> $GITHUB_OUTPUT
+
+      - id: create-matrix
+        run: |
+          echo "matrix=$(cat matrix.json)" >> $GITHUB_ENV
 
 
       - uses: actions/upload-artifact@v2
