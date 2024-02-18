@@ -18,7 +18,7 @@ jobs:
       - id: create-matrix
         name: "Create metadata.json matrix"
         run: |
-          if [ -d "empty-dir" ]; then
+          if [ -d "json-files" ]; then
 
             # Initialize an empty JSON array
             MATRIX_JSON=$(jq -n '[]')
@@ -26,7 +26,7 @@ jobs:
             FILES_PROCESSED=false
             
             # Loop through all metadata.json files in the specified directory
-            for file in $(find empty-dir -name 'metadata.json'); do
+            for file in $(find json-files -name 'metadata.json'); do
               # Slurp the file content into the MATRIX_JSON array
               MATRIX_JSON=$(jq --argfile content $file '. += [$content]' <<< "$MATRIX_JSON")
               FILES_PROCESSED=true
@@ -49,7 +49,7 @@ jobs:
               echo "🟢 Successfuly merged metadata.json:"
               cat /tmp/matrix.json
             else
-              echo "🚨 metadata.json string is empty, no value to be assigned."
+              echo "🚨 metadata.json string is empty. No files were processed"
             fi
           else
             echo "🚨 Directory does not exist, skipping matrix creation."
