@@ -17,26 +17,30 @@ jobs:
 
       - id: create-matrix
         run: |
-          # Initialize an empty JSON array
-          MATRIX_JSON=$(jq -n '[]')
-          
-          # Loop through all metadata.json files in the dist directory
-          for file in $(find json-files-fail -name 'metadata.json'); do
-            # Slurp the file content into the MATRIX_JSON array
-            MATRIX_JSON=$(jq --argfile content $file '. += [$content]' <<< "$MATRIX_JSON")
-          done
-          
-          # Wrap the array in an 'include' object
-          MATRIX_JSON=$(jq '{include: .}' <<< "$MATRIX_JSON")
-          
-          # Echo the final MATRIX_JSON into a file named 'matrix.json'
-          echo "$MATRIX_JSON" > /tmp/matrix.json
-          
-          ## Set to github env 
-          #echo "matrix<<EOF" >> $GITHUB_OUTPUT
-          #cat /tmp/matrix.json >> $GITHUB_OUTPUT
-          #echo "EOF" >> $GITHUB_OUTPUT
-
+          # Check if the directory exists
+          if [ -d "json-files-fail" ]; then
+            # Initialize an empty JSON array
+            MATRIX_JSON=$(jq -n '[]')
+            
+            # Loop through all metadata.json files in the specified directory
+            for file in $(find json-files-fail -name 'metadata.json'); do
+              # Slurp the file content into the MATRIX_JSON array
+              MATRIX_JSON=$(jq --argfile content $file '. += [$content]' <<< "$MATRIX_JSON")
+            done
+            
+            # Wrap the array in an 'include' object
+            MATRIX_JSON=$(jq '{include: .}' <<< "$MATRIX_JSON")
+            
+            # Echo the final MATRIX_JSON into a file named 'matrix.json'
+            echo "$MATRIX_JSON" > /tmp/matrix.json
+            
+            # Set the matrix JSON as an output variable using the $GITHUB_OUTPUT environment variable
+            echo "matrix<<EOF" >> $GITHUB_OUTPUT
+            cat /tmp/matrix.json >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "🚨 Directory does not exist, skipping matrix creation."
+          fi
 
       - uses: actions/upload-artifact@v3
         with:
