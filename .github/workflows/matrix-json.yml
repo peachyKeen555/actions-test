@@ -38,10 +38,10 @@ jobs:
           # Echo the final MATRIX_JSON into a file named 'matrix.json'
           echo "$MATRIX_JSON" > /tmp/matrix.json
           
-          # Set to github env 
-          echo "matrix<<EOF" >> $GITHUB_OUTPUT
-          cat /tmp/matrix.json >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          ## Set to github env 
+          #echo "matrix<<EOF" >> $GITHUB_OUTPUT
+          #cat /tmp/matrix.json >> $GITHUB_OUTPUT
+          #echo "EOF" >> $GITHUB_OUTPUT
 
 
       - uses: actions/upload-artifact@v2
