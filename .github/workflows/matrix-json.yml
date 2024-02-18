@@ -17,6 +17,12 @@ jobs:
 
       - id: create-matrix
         run: |
+
+          # Don't do anything and empty output if there isn't a dist/apps folder
+          # Don't do anything and empty metadata.json if there isn't 
+
+
+
           # Initialize an empty JSON array
           MATRIX_JSON=$(jq -n '[]')
           
@@ -47,6 +53,7 @@ jobs:
   use_matrix:
     needs: build_and_prepare_matrix
     runs-on: ubuntu-latest
+    if: ${{ needs.build_and_prepare_matrix.outputs.matrix }}
     strategy:
       matrix: ${{fromJson(needs.build_and_prepare_matrix.outputs.matrix)}}
     steps:
