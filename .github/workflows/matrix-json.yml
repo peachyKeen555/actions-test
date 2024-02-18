@@ -16,28 +16,39 @@ jobs:
           # This should produce the dist directory with metadata.json files
 
       - id: create-matrix
+        name: "Create metadata.json matrix"
         run: |
-          # Check if the directory exists
           if [ -d "json-files-fail" ]; then
+
             # Initialize an empty JSON array
             MATRIX_JSON=$(jq -n '[]')
+            # Flag to check if any files were processed
+            FILES_PROCESSED=false
             
             # Loop through all metadata.json files in the specified directory
             for file in $(find json-files-fail -name 'metadata.json'); do
               # Slurp the file content into the MATRIX_JSON array
               MATRIX_JSON=$(jq --argfile content $file '. += [$content]' <<< "$MATRIX_JSON")
+              FILES_PROCESSED=true
             done
             
-            # Wrap the array in an 'include' object
-            MATRIX_JSON=$(jq '{include: .}' <<< "$MATRIX_JSON")
+            # Only set matrix to output if processing has occured
+            if [ "$FILES_PROCESSED" = true ]; then
+
+              # Wrap the array in an 'include' object
+              MATRIX_JSON=$(jq '{include: .}' <<< "$MATRIX_JSON")
             
-            # Echo the final MATRIX_JSON into a file named 'matrix.json'
-            echo "$MATRIX_JSON" > /tmp/matrix.json
+              # Echo the final MATRIX_JSON into a file named 'matrix.json'
+              echo "$MATRIX_JSON" > /tmp/matrix.json
             
-            # Set the matrix JSON as an output variable using the $GITHUB_OUTPUT environment variable
-            echo "matrix<<EOF" >> $GITHUB_OUTPUT
-            cat /tmp/matrix.json >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+              # Set the matrix JSON as an output variable using the $GITHUB_OUTPUT environment variable
+              echo "matrix<<EOF" >> $GITHUB_OUTPUT
+              cat /tmp/matrix.json >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+
+            else
+              echo "🚨 metadata.json string is empty, no value to be assigned."
+            fi
           else
             echo "🚨 Directory does not exist, skipping matrix creation."
           fi
