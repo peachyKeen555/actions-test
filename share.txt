@@ -18,3 +18,35 @@ function executeCommand(command, args) {
     });
   });
 }
+
+
+#!/bin/bash
+
+# Configure old and new registry URLs
+OLD_REGISTRY_URL="https://old-registry.example.com"
+NEW_REGISTRY_URL="https://new-registry.example.com"
+
+# Path to your packages list
+PACKAGES_LIST="packages.txt"
+
+# Login to the old registry (if required)
+# npm login --registry=$OLD_REGISTRY_URL
+
+# Loop through the packages list
+while IFS= read -r package
+do
+    echo "Processing $package..."
+
+    # Pack the package from the old registry
+    npm pack "$package" --registry=$OLD_REGISTRY_URL
+
+    # Extract package name and version for filename
+    PACKAGE_TAR=$(echo $package | tr '@' ' ' | awk '{print $2"-"$3".tgz"}')
+
+    # Publish to the new registry
+    npm publish $PACKAGE_TAR --registry=$NEW_REGISTRY_URL
+
+    # Optionally, remove the tarball after publishing
+    rm $PACKAGE_TAR
+
+done < "$PACKAGES_LIST"
